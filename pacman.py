@@ -5,6 +5,7 @@
 """
 
 from dataclasses import dataclass, field
+import pygame
 
 WIDTH = 21
 HEIGHT = 15
@@ -38,8 +39,6 @@ class GameState:
             self.pacman_y = ny
 
 
-
-
         
 def generate_maze(w,h):
     maze = [["." for _ in range(w)] for _ in range(h)]
@@ -55,33 +54,57 @@ def generate_maze(w,h):
         
 MAZE = generate_maze(WIDTH,HEIGHT)
 
-
-
     
 
 def draw():
     for row in MAZE:
         print(row)
 
-def draw_state(state):
-    for  y in range(state.height):
-        line = ""
+def draw_state_pygame(screen, state):
+    cell = 40
+    wall_color = (0, 0, 255)
+    pellet_color = (255, 255, 255)
+    pacman_color = (255, 255, 0)
+ 
+    screen.fill((0, 0, 0))
+
+    for y in range(state.height):
         for x in range(state.width):
-            if x == state.pacman_x and y == state.pacman_y:
-                line += "P"
-            else:
-                line += state.maze[y][x]
-        print(line)
-        
+            ch = state.maze[y][x]
+            px, py = x * cell, y* cell
+
+            if ch == "#":
+                pygame.draw.rect(screen, wall_color, (px, py, cell, cell))
+            elif ch == ".":
+                pygame.draw.circle(screen, pellet_color, (px + cell //2, py + cell // 2), 4) 
+    pygame.draw.circle(
+        screen, pacman_color,
+        (state.pacman_x * cell + cell // 2, state.pacman_y * cell + cell // 2), cell // 2 - 4
+    )
+
+
 def main():
+    pygame.init()
+    screen = pygame.display.set_mode((840,600))
+    
     state = GameState()
-    draw_state(state)    
-    state.move_pacman(1,0)
-    print()
-    draw_state(state)
-    
-    
-    
+
+    clock = pygame.time.Clock()
+    running = True        
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]: state.move_pacman(0, -1)            
+        if keys[pygame.K_s]: state.move_pacman(0, 1)
+        if keys[pygame.K_a]: state.move_pacman(-1, 0)
+        if keys[pygame.K_d]: state.move_pacman(1, 0)
+                
+        draw_state_pygame(screen, state)
+        pygame.display.flip()
+        clock.tick(10)
 
 if __name__ == "__main__":
     main()
