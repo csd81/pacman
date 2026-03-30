@@ -37,6 +37,9 @@ class GameState:
             self.pacman_x = nx
             self.pacman_y = ny
 
+
+
+
         
 def generate_maze(w,h):
     maze = [["." for _ in range(w)] for _ in range(h)]
@@ -59,12 +62,24 @@ MAZE = generate_maze(WIDTH,HEIGHT)
 def draw():
     for row in MAZE:
         print(row)
+
+def draw_state(state):
+    for  y in range(state.height):
+        line = ""
+        for x in range(state.width):
+            if x == state.pacman_x and y == state.pacman_y:
+                line += "P"
+            else:
+                line += state.maze[y][x]
+        print(line)
         
 def main():
     state = GameState()
-    draw()
+    draw_state(state)    
     state.move_pacman(1,0)
-    print(state.pacman_x, state.pacman_y)
+    print()
+    draw_state(state)
+    
     
     
 
